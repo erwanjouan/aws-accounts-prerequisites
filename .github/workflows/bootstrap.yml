@@ -15,6 +15,7 @@ env:
 jobs:
 
   bootstrap-management:
+    environment: production # github environment
     name: CDK bootstrap – management
     runs-on: ubuntu-latest
     permissions:
