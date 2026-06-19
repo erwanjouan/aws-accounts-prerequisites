@@ -2,12 +2,8 @@ REGION             ?= eu-west-3
 PROFILE_MANAGEMENT ?= management
 PROFILE_PRODUCTION ?= production
 GITHUB_ORG         ?= erwanjouan
-GITHUB_REPO        ?= aws-accounts-prerequisites
+GITHUB_REPO        ?= *
 OIDC_STACK_NAME    ?= GitHubOIDC
-
-# Load account IDs from .env if present (overridden by environment variables)
--include .env
-export
 
 # ─── File targets ────────────────────────────────────────────────────────────
 

@@ -46,7 +46,7 @@ Resources:
       # AWS no longer enforces thumbprint validation for token.actions.githubusercontent.com
       # (Oct 2023) but CloudFormation still requires the field.
       ThumbprintList:
-        - 6938fd4d98bab03faadb97b34396831e3780aea
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
 
   GitHubActionsRole:
     Type: AWS::IAM::Role
