@@ -1,0 +1,69 @@
+name: Bootstrap AWS Accounts
+
+# Prerequisite: run `make deploy-oidc` locally before triggering this workflow.
+# That deploys the GitHub OIDC provider + IAM role to both accounts so the
+# jobs below can authenticate without stored credentials.
+on:
+  workflow_dispatch:
+
+env:
+  REGION: eu-west-3
+  NODE_VERSION: '20'
+  # Must match the RoleName parameter in cf-github-oidc.yml
+  ROLE_NAME: GitHubActionsRole
+
+jobs:
+
+  bootstrap-management:
+    name: CDK bootstrap – management
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.MANAGEMENT_ACCOUNT_ID }}:role/${{ env.ROLE_NAME }}
+          aws-region: ${{ env.REGION }}
+
+      - name: CDK bootstrap
+        run: |
+          npx cdk bootstrap aws://${{ secrets.MANAGEMENT_ACCOUNT_ID }}/${{ env.REGION }}
+
+  bootstrap-production:
+    name: CDK bootstrap – production
+    runs-on: ubuntu-latest
+    # Management must be bootstrapped first so the --trust ARN is valid
+    needs: bootstrap-management
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.PRODUCTION_ACCOUNT_ID }}:role/${{ env.ROLE_NAME }}
+          aws-region: ${{ env.REGION }}
+
+      - name: CDK bootstrap (trust management account)
+        run: |
+          npx cdk bootstrap aws://${{ secrets.PRODUCTION_ACCOUNT_ID }}/${{ env.REGION }} \
+            --trust ${{ secrets.MANAGEMENT_ACCOUNT_ID }} \
+            --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess

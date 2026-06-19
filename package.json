@@ -1,0 +1,8 @@
+{
+  "name": "aws-accounts-prerequisites",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "aws-cdk": "^2.170.0"
+  }
+}
