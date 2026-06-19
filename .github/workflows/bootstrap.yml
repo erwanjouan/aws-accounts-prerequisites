@@ -15,7 +15,7 @@ env:
 jobs:
 
   bootstrap-management:
-    environment: production # github environment
+    environment: production
     name: CDK bootstrap – management
     runs-on: ubuntu-latest
     permissions:
@@ -41,6 +41,7 @@ jobs:
           npx cdk bootstrap aws://${{ secrets.MANAGEMENT_ACCOUNT_ID }}/${{ env.REGION }}
 
   bootstrap-production:
+    environment: production
     name: CDK bootstrap – production
     runs-on: ubuntu-latest
     # Management must be bootstrapped first so the --trust ARN is valid
