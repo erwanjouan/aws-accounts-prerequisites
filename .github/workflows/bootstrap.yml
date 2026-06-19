@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
 
 env:
+  AUTHORIZED_ACTOR: erwanjouan
   REGION: eu-west-3
   NODE_VERSION: '20'
   # Must match the RoleName parameter in cf-github-oidc.yml
@@ -22,6 +23,12 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Check authorized actor
+        if: github.actor != env.AUTHORIZED_ACTOR
+        run: |
+          echo "❌ '${{ github.actor }}' is not authorized to run this workflow."
+          exit 1
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
@@ -50,6 +57,12 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Check authorized actor
+        if: github.actor != env.AUTHORIZED_ACTOR
+        run: |
+          echo "❌ '${{ github.actor }}' is not authorized to run this workflow."
+          exit 1
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
